@@ -1,50 +1,37 @@
-use std::collections::hash_map::OccupiedEntry;
 use std::fs::File;
-use std::io::{self,BufRead};
-use std::path::Path;
-use std::process::Output;
+use std::io::{BufRead, BufReader};
 
-fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
-}
-
-fn check_if_one_of_biggest(element:i8, current_bigest_nums:[i8;5])->[i8;5]{
-   let mut cbn = current_bigest_nums;
-   let mut el = element;
-   println!("{}{:?}", el, cbn);
-    for j in 0..cbn.len(){
-        if el > cbn[j]{
-            let temp_el = cbn[j];
-            cbn[j] = el;
-            el = temp_el;
+fn get_five_biggest_fixedboi(arr: &Vec<i32>) -> [i32; 5] {
+    let mut output = [0, 0, 0, 0, 0];
+    for i in 0..arr.len() {
+        let mut value = arr[i];
+        // DEBUGGING:
+        // println!("{} - {:?}", value, output);
+        for j in 0..output.len() {
+            if value > output[j] {
+                let temp = output[j];
+                output[j] = value;
+                value = temp;
+            }
         }
-        else {
-            continue;
-        }
-    }
-    return cbn;
-}
-
-fn get_five_biggest(arr:Vec<i8>)-> [i8;5]{
-    let mut output:[i8;5] = [0,0,0,0,0];
-    for i in 0..arr.len(){
-        let el:i8 = arr[i];
-        output = check_if_one_of_biggest(el, output);
     }
     return output;
 }
 
+// Did some small code edits c:
+//      ~Kihau
 fn main() {
     let mut numbers = Vec::new();
-    if let Ok(lines) = read_lines("/home/mioshek/Programming_Stuff/Programming/Rust/exercises/five_largest_numbers/test.txt"){
-        for line in lines{
-            if let Ok(int) = line{
-                let number = int.parse::<i8>().unwrap();
-                numbers.push(number);
-            }
+
+    let file_handle = File::open("test.txt").expect("File not found???????");
+    let lines = BufReader::new(file_handle).lines();
+
+    for line in lines {
+        let line = line.unwrap();
+        if let Ok(number) = line.parse::<i32>() {
+            numbers.push(number);
         }
     }
-    println!("{:?}",get_five_biggest(numbers));
+    println!("Initial array = {:?}", numbers);
+    println!("Max 5 = {:?}", get_five_biggest_fixedboi(&numbers));
 }
